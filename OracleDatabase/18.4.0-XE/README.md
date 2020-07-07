@@ -12,6 +12,7 @@ makes configuration much easier
 
 1. Clone this repository `git clone https://github.com/oracle/vagrant-projects`
 2. Change into the `vagrant-projects/OracleDatabase/18.4.0-XE` directory
+   1. Put the [Oracle Database 18c XE rpm install file](https://download.oracle.com/otn-pub/otn_software/db-express/oracle-database-xe-18c-1.0-1.x86_64.rpm) into this directory if you do not wish to install Oracle Database 18c XE via the internet. This is usually desired if you already have a local copy of the install file and don't want to download it from the internet again.
 3. Run `vagrant up`
    1. The first time you run this it will provision everything and may take a while. Ensure you have a good internet connection as the scripts will update the VM to the latest via `yum`.
    2. The installation can be customized, if desired (see [Configuration](#configuration)).

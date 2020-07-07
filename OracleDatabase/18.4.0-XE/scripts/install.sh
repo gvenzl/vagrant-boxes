@@ -29,7 +29,7 @@ echo LC_ALL=en_US.utf-8 >> /etc/environment
 echo 'INSTALLER: Locale set'
 
 # set system time zone
-sudo timedatectl set-timezone $SYSTEM_TIMEZONE
+sudo timedatectl set-timezone "$SYSTEM_TIMEZONE"
 echo "INSTALLER: System time zone set to $SYSTEM_TIMEZONE"
 
 # Install Oracle Database prereq and openssl packages
@@ -40,20 +40,29 @@ yum install -y oracle-database-preinstall-18c openssl
 echo 'INSTALLER: Oracle preinstall and openssl complete'
 
 # set environment variables
-echo "export ORACLE_BASE=/opt/oracle" >> /home/oracle/.bashrc
-echo "export ORACLE_HOME=/opt/oracle/product/18c/dbhomeXE" >> /home/oracle/.bashrc
-echo "export ORACLE_SID=XE" >> /home/oracle/.bashrc
-echo "export PATH=\$PATH:\$ORACLE_HOME/bin" >> /home/oracle/.bashrc
+{
+  echo "export ORACLE_BASE=/opt/oracle"
+  echo "export ORACLE_HOME=/opt/oracle/product/18c/dbhomeXE"
+  echo "export ORACLE_SID=XE"
+  echo "export PATH=\$PATH:\$ORACLE_HOME/bin"
+} >> /home/oracle/.bashrc
 
 echo 'INSTALLER: Environment variables set'
 
+echo 'INSTALLER: Installing Oracle software'
 # Install Oracle
-yum -y localinstall https://download.oracle.com/otn-pub/otn_software/db-express/oracle-database-xe-18c-1.0-1.x86_64.rpm
+# If local file exists, install from local file, otherwise download from internet
+local_install_file="/vagrant/oracle-database-xe-18c-1.0-1.x86_64.rpm"
+if [ -f "$local_install_file" ]; then
+  yum -y localinstall "$local_install_file"
+else
+  yum -y localinstall https://download.oracle.com/otn-pub/otn_software/db-express/oracle-database-xe-18c-1.0-1.x86_64.rpm
+fi;
 
 echo 'INSTALLER: Oracle software installed'
 
 # Auto generate ORACLE PWD if not passed on
-export ORACLE_PWD=${ORACLE_PWD:-"`openssl rand -base64 8`1"}
+export ORACLE_PWD=${ORACLE_PWD:-"$(openssl rand -base64 8)1"}
 
 # Create database
 mv /etc/sysconfig/oracle-xe-18c.conf /etc/sysconfig/oracle-xe-18c.conf.original
